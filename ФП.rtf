@@ -1,0 +1,138 @@
+{\rtf1\ansi\ansicpg1251\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red35\green35\blue42;\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c18431\c18431\c21569;\cssrgb\c100000\c100000\c100000;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww22200\viewh18640\viewkind0
+\deftab720
+\pard\pardeftab720\sa80\partightenfactor0
+
+\f0\fs36 \cf2 \cb3 \expnd0\expndtw0\kerning0
+1. \uc0\u1047 \u1072 \u1074 \u1072 \u1085 \u1090 \u1072 \u1078 \u1090 \u1077  \u1076 \u1072 \u1085 \u1110 :\
+\
+## \uc0\u1089 \u1090 \u1074 \u1086 \u1088 \u1102 \u1108 \u1084 \u1086  \u1089 \u1093 \u1077 \u1084 \u1091 \
+CREATE SCHEMA IF NOT EXISTS pandemic;\
+\
+## \uc0\u1088 \u1086 \u1073 \u1080 \u1084 \u1086  \u1111 \u1111  \u1072 \u1082 \u1090 \u1080 \u1074 \u1085 \u1086 \u1102  \u1079 \u1072  \u1079 \u1072 \u1084 \u1086 \u1074 \u1095 \u1091 \u1074 \u1072 \u1085 \u1085 \u1103 \u1084 \
+USE pandemic;\
+\
+2. \uc0\u1053 \u1086 \u1088 \u1084 \u1072 \u1083 \u1110 \u1079 \u1091 \u1081 \u1090 \u1077  \u1090 \u1072 \u1073 \u1083 \u1080 \u1094 \u1102  infectious_cases \u1076 \u1086  3\u1111  \u1085 \u1086 \u1088 \u1084 \u1072 \u1083 \u1100 \u1085 \u1086 \u1111  \u1092 \u1086 \u1088 \u1084 \u1080 . \u1047 \u1073 \u1077 \u1088 \u1077 \u1078 \u1110 \u1090 \u1100  \u1091  \u1094 \u1110 \u1081  \u1078 \u1077  \u1089 \u1093 \u1077 \u1084 \u1110  \u1076 \u1074 \u1110  \u1090 \u1072 \u1073 \u1083 \u1080 \u1094 \u1110  \u1079  \u1085 \u1086 \u1088 \u1084 \u1072 \u1083 \u1110 \u1079 \u1086 \u1074 \u1072 \u1085 \u1080 \u1084 \u1080  \u1076 \u1072 \u1085 \u1080 \u1084 \u1080 .\
+\
+## 1. \
+USE pandemic;\
+\
+## 2. \uc0\u1055 \u1110 \u1076 \u1088 \u1072 \u1093 \u1091 \u1085 \u1086 \u1082  \u1079 \u1072 \u1087 \u1080 \u1089 \u1110 \u1074  \u1091  \u1086 \u1088 \u1080 \u1075 \u1110 \u1085 \u1072 \u1083 \u1100 \u1085 \u1110 \u1081  \u1090 \u1072 \u1073 \u1083 \u1080 \u1094 \u1110 \
+SELECT\
+  COUNT(*) AS total_records\
+FROM infectious_cases;\
+\
+## 3. \uc0\u1057 \u1090 \u1074 \u1086 \u1088 \u1102 \u1108 \u1084 \u1086  \u1090 \u1072 \u1073 \u1083 \u1080 \u1094 \u1102  locations\
+CREATE TABLE IF NOT EXISTS locations (\
+  location_id INT AUTO_INCREMENT PRIMARY KEY,\
+  country     VARCHAR(100) NOT NULL,\
+  region      VARCHAR(100)     -- \uc0\u1103 \u1082 \u1097 \u1086  \u1108 \
+);\
+\
+## 4. \uc0\u1057 \u1090 \u1074 \u1086 \u1088 \u1102 \u1108 \u1084 \u1086  \u1090 \u1072 \u1073 \u1083 \u1080 \u1094 \u1102  cases -  location_id\
+CREATE TABLE IF NOT EXISTS cases (\
+  case_id     INT       AUTO_INCREMENT PRIMARY KEY,\
+  location_id INT       NOT NULL,\
+  report_date DATE      NOT NULL,\
+  confirmed   INT,\
+  deaths      INT,\
+  recovered   INT,\
+  FOREIGN KEY (location_id) REFERENCES locations(location_id)\
+);\
+\
+## 5. \uc0\u1053 \u1072 \u1087 \u1086 \u1074 \u1085 \u1102 \u1108 \u1084 \u1086  locations\
+INSERT INTO locations (country, region)\
+SELECT DISTINCT\
+  country,\
+  region\
+FROM infectious_cases;\
+\
+## 6. \uc0\u1053 \u1072 \u1087 \u1086 \u1074 \u1085 \u1102 \u1108 \u1084 \u1086  cases\
+INSERT INTO cases (location_id, report_date, confirmed, deaths, recovered)\
+SELECT\
+  l.location_id,\
+  ic.report_date,\
+  ic.confirmed,\
+  ic.deaths,\
+  ic.recovered\
+FROM infectious_cases AS ic\
+JOIN locations AS l\
+  ON ic.country = l.country\
+ AND ic.region  = l.region;\
+ \
+SELECT\
+  COUNT(*) AS total_records\
+FROM infectious_cases;\
+\
+3. \uc0\u1055 \u1088 \u1086 \u1072 \u1085 \u1072 \u1083 \u1110 \u1079 \u1091 \u1081 \u1090 \u1077  \u1076 \u1072 \u1085 \u1110 :\
+\
+USE pandemic;\
+\
+SELECT\
+  ic.Entity,\
+  ic.Code,\
+  AVG(ic.Number_rabies+0)   AS avg_rabies,\
+  MIN(ic.Number_rabies+0)   AS min_rabies,\
+  MAX(ic.Number_rabies+0)   AS max_rabies,\
+  SUM(ic.Number_rabies+0)   AS sum_rabies\
+FROM infectious_cases AS ic\
+WHERE ic.Number_rabies IS NOT NULL\
+  AND ic.Number_rabies <> ''\
+GROUP BY ic.Entity, ic.Code\
+ORDER BY avg_rabies DESC\
+LIMIT 10;\
+\
+4. \uc0\u1055 \u1086 \u1073 \u1091 \u1076 \u1091 \u1081 \u1090 \u1077  \u1082 \u1086 \u1083 \u1086 \u1085 \u1082 \u1091  \u1088 \u1110 \u1079 \u1085 \u1080 \u1094 \u1110  \u1074  \u1088 \u1086 \u1082 \u1072 \u1093 .\
+\
+USE pandemic;\
+\
+SELECT\
+  Year,\
+  ## 1) \uc0\u1044 \u1072 \u1090 \u1072  \u1087 \u1077 \u1088 \u1096 \u1086 \u1075 \u1086  \u1089 \u1110 \u1095 \u1085 \u1103  \u1074 \u1110 \u1076 \u1087 \u1086 \u1074 \u1110 \u1076 \u1085 \u1086 \u1075 \u1086  \u1088 \u1086 \u1082 \u1091 \
+  MAKEDATE(Year, 1) AS year_start_date,\
+  ## 2) \uc0\u1055 \u1086 \u1090 \u1086 \u1095 \u1085 \u1072  \u1076 \u1072 \u1090 \u1072 \
+  CURDATE() AS today_date,\
+  ## 3) \uc0\u1056 \u1110 \u1079 \u1085 \u1080 \u1094 \u1103  \u1074  \u1088 \u1086 \u1082 \u1072 \u1093  \u1084 \u1110 \u1078  \u1085 \u1080 \u1084 \u1080 \
+  TIMESTAMPDIFF(\
+    YEAR,\
+    MAKEDATE(Year, 1),\
+    CURDATE()\
+  )AS years_difference\
+FROM infectious_cases;\
+\
+\pard\pardeftab720\sa160\partightenfactor0
+\cf2 5. \uc0\u1055 \u1086 \u1073 \u1091 \u1076 \u1091 \u1081 \u1090 \u1077  \u1074 \u1083 \u1072 \u1089 \u1085 \u1091  \u1092 \u1091 \u1085 \u1082 \u1094 \u1110 \u1102 .\
+\
+USE pandemic;\
+\
+## 1) \uc0\u1042 \u1080 \u1076 \u1072 \u1083 \u1103 \u1108 \u1084 \u1086  \u1089 \u1090 \u1072 \u1088 \u1091  \u1074 \u1077 \u1088 \u1089 \u1110 \u1102  \u1092 \u1091 \u1085 \u1082 \u1094 \u1110 \u1111 , \u1103 \u1082 \u1097 \u1086  \u1108 \
+DROP FUNCTION IF EXISTS calc_years_diff;\
+\
+## 2) \uc0\u1057 \u1090 \u1074 \u1086 \u1088 \u1102 \u1108 \u1084 \u1086  \u1085 \u1086 \u1074 \u1091  \u1092 \u1091 \u1085 \u1082 \u1094 \u1110 \u1102 \
+DELIMITER $$\
+CREATE FUNCTION calc_years_diff(\
+  input_year INT\
+) \
+RETURNS INT\
+DETERMINISTIC\
+BEGIN\
+  ## \uc0\u1088 \u1086 \u1073 \u1080 \u1084 \u1086  \u1076 \u1072 \u1090 \u1091  1-\u1075 \u1086  \u1089 \u1110 \u1095 \u1085 \u1103  input_year \u1110  \u1088 \u1072 \u1093 \u1091 \u1108 \u1084 \u1086  \u1088 \u1110 \u1079 \u1085 \u1080 \u1094 \u1102  \u1074  \u1088 \u1086 \u1082 \u1072 \u1093  \u1076 \u1086  \u1089 \u1100 \u1086 \u1075 \u1086 \u1076 \u1085 \u1110 \
+  RETURN TIMESTAMPDIFF(\
+    YEAR,\
+    MAKEDATE(input_year, 1),\
+    CURDATE()\
+  );\
+END$$\
+DELIMITER ;\
+\
+## 3) \uc0\u1055 \u1088 \u1080 \u1082 \u1083 \u1072 \u1076  \u1079 \u1072 \u1089 \u1090 \u1086 \u1089 \u1091 \u1074 \u1072 \u1085 \u1085 \u1103 : \
+## \uc0\u1076 \u1083 \u1103  \u1082 \u1086 \u1078 \u1085 \u1086 \u1075 \u1086  \u1088 \u1086 \u1082 \u1091  \u1079  \u1090 \u1072 \u1073 \u1083 \u1080 \u1094 \u1110  infectious_cases \u1086 \u1090 \u1088 \u1080 \u1084 \u1072 \u1108 \u1084 \u1086  \u1082 \u1110 \u1083 \u1100 \u1082 \u1110 \u1089 \u1090 \u1100  \u1087 \u1086 \u1074 \u1085 \u1080 \u1093  \u1088 \u1086 \u1082 \u1110 \u1074  \u1074 \u1110 \u1076  1-\u1075 \u1086  \u1089 \u1110 \u1095 \u1085 \u1103  \u1094 \u1100 \u1086 \u1075 \u1086  \u1088 \u1086 \u1082 \u1091  \u1076 \u1086  \u1089 \u1100 \u1086 \u1075 \u1086 \u1076 \u1085 \u1110 \
+SELECT\
+  Year,\
+  calc_years_diff(Year) AS years_difference\
+FROM infectious_cases;\
+\
+}
